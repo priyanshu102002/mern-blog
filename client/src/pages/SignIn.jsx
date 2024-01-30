@@ -1,28 +1,33 @@
 import { Alert, Button, Label, TextInput } from "flowbite-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+    signInFailure,
+    signInStart,
+    signInSuccess,
+} from "../redux/user/userSlice";
 
 const SignIn = () => {
     const [formData, setFormData] = useState({});
-    const [loading, setLoading] = useState(false);
-    const [errorMessage, setErrorMessage] = useState(null);
+    const { loading, error: errorMessage } = useSelector((state) => state.user);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.id]: e.target.value });
+        setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         // Check if all fields are filled
         if (!formData.email || !formData.password) {
-            setErrorMessage("Please fill out all the fields.");
+            dispatch(signInFailure("Please fill out all the fields."));
             return;
         }
 
         try {
-            setLoading(true);
-            setErrorMessage(null); // Reset error message
+            dispatch(signInStart());
             const response = await fetch("/api/auth/signin", {
                 method: "POST",
                 headers: {
@@ -32,17 +37,20 @@ const SignIn = () => {
             });
             const data = await response.json();
             if (data.success === false) {
-                setLoading(false);
-                setErrorMessage("This email or password is not correct.");
+                dispatch(
+                    signInFailure("This email or password is not correct.")
+                );
                 return;
             }
-            setLoading(false);
+
             if (response.ok) {
+                dispatch(signInSuccess(data));
                 navigate("/");
             }
         } catch (error) {
-            setErrorMessage("Api is not working. Please try again later.");
-            setLoading(false);
+            dispatch(
+                signInFailure("Api is not working. Please try again later.")
+            );
         }
     };
 
