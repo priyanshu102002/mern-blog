@@ -50,7 +50,17 @@ export const updateUser = async (req, res, next) => {
     } catch (error) {
         return next(errorHandler(500, 'Internal Server Error'));
     }
+}
 
+export const deleteUser = async (req, res, next) => {
+    if (req.params.userId !== req.user.id) {
+        return next(errorHandler(401, 'You are not authorized to perform this action'));
+    }
+    try {
+        await User.findByIdAndDelete(req.params.userId);
+        res.status(200).json('User has been deleted');
 
-
+    } catch (error) {
+        next(errorHandler(500, 'Internal Server Error'));
+    }
 }
