@@ -92,7 +92,7 @@ const CreatePost = () => {
                 return;
             } else {
                 setPublishError(null);
-                navigate(`/post/${data.slug}`)
+                navigate(`/post/${data.slug}`);
             }
         } catch (error) {
             setPublishError("Failed to publish post. Please try again later.");
