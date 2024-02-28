@@ -39,6 +39,7 @@ export const getPosts = async (req, res, next) => {
         const sortDirection = req.query.order === "asc" ? 1 : -1;
 
         const posts = await Post.find({
+            // userId ki value ke basis par posts ko filter karta hai.
             ...(req.query.userId && { userId: req.query.userId }),
             ...(req.query.category && { categories: req.query.category }),
             ...(req.query.slug && { slug: req.query.slug }),
